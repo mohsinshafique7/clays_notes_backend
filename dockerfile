@@ -9,7 +9,6 @@ COPY package*.json ./
 
 # Install both dependencies and devDependencies
 RUN yarn
-
 # Copy application source code
 COPY . .
 

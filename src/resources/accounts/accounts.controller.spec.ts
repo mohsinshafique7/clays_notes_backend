@@ -59,7 +59,7 @@ describe('AccountsController', () => {
     jest.clearAllMocks();
   });
   describe('Delete', () => {
-    it('should delete a sleep record by ID', async () => {
+    it('Should delete a sleep record by ID.', async () => {
       const mockedDeleteResult = { affected: 1 };
       const mockedRetrievedByIdValue = {
         id: 1,
@@ -82,7 +82,7 @@ describe('AccountsController', () => {
       );
       expect(res).toEqual({ message: `Account Id 1 deleted successfully` });
     });
-    it('Raise error if not found', async () => {
+    it('Should raise an error if the record is not found.', async () => {
       jest.spyOn(accountService, 'exists').mockResolvedValue(false);
       await expect(controller.remove('1')).rejects.toThrow(
         new NotFoundException('Account record not found'),
@@ -93,7 +93,7 @@ describe('AccountsController', () => {
     });
   });
   describe('findOne', () => {
-    it('should return a single account record by ID', async () => {
+    it('Should return a single account record by ID.', async () => {
       const mockedData = new Account();
       jest.spyOn(accountService, 'findOne').mockResolvedValue(new Account());
 
@@ -104,7 +104,7 @@ describe('AccountsController', () => {
     });
   });
   describe('findAll', () => {
-    it('should return all sleep records with pagination', async () => {
+    it('Should return all sleep records with pagination.', async () => {
       const raw_data = {
         accounts: [
           {
@@ -149,16 +149,14 @@ describe('AccountsController', () => {
     });
   });
   describe('update', () => {
-    // params: { id: "6" },
-    // body: { sleepHours: 5, date: "2024-05-02", accountId: 6 },
-    it('Raise error Record not found', async () => {
+    it('Should raise an error if the record is not found.', async () => {
       jest.spyOn(accountService, 'findOne').mockResolvedValue(null);
 
       await expect(controller.update('6', new Account())).rejects.toThrow(
         new BadRequestException(`Record not found for id 6`),
       );
     });
-    it('Update as  Record found', async () => {
+    it('Should update the record if found.', async () => {
       const updatedRecord = new Account();
 
       jest.spyOn(accountService, 'findOne').mockResolvedValue(new Account());
@@ -174,7 +172,7 @@ describe('AccountsController', () => {
     });
   });
   describe('create', () => {
-    it('create new record', async () => {
+    it('Should create a new record.', async () => {
       const mockNewData = {
         name: 'string',
         gender: 'male',
@@ -196,7 +194,7 @@ describe('AccountsController', () => {
         data: expect.any(Account),
       });
     });
-    it('record exist raise error for more than 24 hours', async () => {
+    it('Should raise an error if the record already exists and sleep hours exceed 24.', async () => {
       const mockNewData = {
         name: 'string',
         gender: 'male',
@@ -226,7 +224,7 @@ describe('AccountsController', () => {
       expect(accountService.findByName).toHaveBeenCalledWith(mockNewData.name);
       expect(sleepService.findByAccountIdAndDate).toHaveBeenCalledTimes(1);
     });
-    it('record exist update record', async () => {
+    it('Should update the record if it already exists.', async () => {
       const mockNewData = {
         name: 'string',
         gender: 'male',

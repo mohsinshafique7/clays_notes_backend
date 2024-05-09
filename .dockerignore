@@ -1,4 +1,7 @@
 Dockerfile
+docker-compose.yaml
+docker-compose-test.yaml
 .dockerignore
 node_modules
 npm-debug.log
+nest-cli.json

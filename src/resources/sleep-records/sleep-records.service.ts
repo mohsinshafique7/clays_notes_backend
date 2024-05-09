@@ -1,12 +1,5 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import {
-  Connection,
-  DeleteResult,
-  EntityManager,
-  Repository,
-  UpdateResult,
-  getManager,
-} from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { SleepRecord } from './entities/sleep-record.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSleepRecordDto } from './dto/create-sleep-record.dto';
@@ -16,7 +9,6 @@ export class SleepRecordsService {
   constructor(
     @InjectRepository(SleepRecord)
     private sleepRecordRepository: Repository<SleepRecord>,
-    private readonly entityManager: EntityManager,
   ) {}
   async create(sleepRecord: CreateSleepRecordDto): Promise<SleepRecord> {
     try {
@@ -61,47 +53,24 @@ export class SleepRecordsService {
       throw new InternalServerErrorException('Error retrieving sleep record');
     }
   }
-  findByAccountIdAndDate(
+  async findByAccountIdAndDate(
     accountId: number,
     date: Date,
   ): Promise<SleepRecord[]> {
-    return this.sleepRecordRepository.find({ where: { accountId, date } });
+    try {
+      return await this.sleepRecordRepository.find({
+        where: { accountId, date },
+      });
+    } catch (err) {
+      throw new InternalServerErrorException('Error retrieving sleep record');
+    }
   }
 
-  async update(sleepRecord: SleepRecord): Promise<number> {
+  async update(sleepRecord: Partial<SleepRecord>): Promise<SleepRecord> {
     try {
-      // return await this.sleepRecordRepository.save(sleepRecord);
-      let resp: UpdateResult;
-      await this.entityManager.transaction(async (entityManager) => {
-        const result = await entityManager
-          .createQueryBuilder()
-          .select('COALESCE(SUM(sleepRecord.sleepHours), 0)', 'totalSleepHours')
-          .from(SleepRecord, 'sleepRecord')
-          .where('sleepRecord.date = :date', { date: sleepRecord.date })
-          .andWhere('sleepRecord.accountId = :accountId', {
-            accountId: sleepRecord.accountId,
-          })
-          .getRawOne();
-
-        // await entityManager.save(sleepRecord);
-        const availableSleepHours = 24 - result.totalSleepHours;
-        const updatedSleepHours = Math.min(
-          sleepRecord.sleepHours,
-          availableSleepHours,
-        );
-        resp = await entityManager
-          .createQueryBuilder()
-          .update(SleepRecord)
-          .set({ sleepHours: updatedSleepHours })
-          .where('date = :date', { date: sleepRecord.date })
-          .andWhere('id = :id', {
-            id: sleepRecord.id,
-          })
-          .execute();
-      });
-      return resp.affected;
+      return await this.sleepRecordRepository.save(sleepRecord);
     } catch (err) {
-      throw new InternalServerErrorException(err);
+      throw new InternalServerErrorException('Error Updating Record');
     }
   }
 

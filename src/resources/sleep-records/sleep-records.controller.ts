@@ -11,7 +11,6 @@ import {
   HttpStatus,
   NotFoundException,
   UsePipes,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { SleepRecordsService } from './sleep-records.service';
 import {
@@ -70,6 +69,23 @@ export class SleepRecordsController {
   @Post()
   @UsePipes(new JoiValidationPipe(createSchema))
   async create(@Body() sleepRecord: CreateSleepRecordDto) {
+    const savedData = await this.sleepRecordsService.findByAccountIdAndDate(
+      sleepRecord.accountId,
+      sleepRecord.date,
+    );
+
+    const totalSavedHours = savedData.reduce((total, item) => {
+      total += item.sleepHours;
+      return total;
+    }, 0);
+
+    const availableHours = 24 - totalSavedHours;
+
+    if (sleepRecord.sleepHours > availableHours) {
+      throw new BadRequestException(
+        `Total Available Hours left for date ${sleepRecord.date} are ${availableHours}`,
+      );
+    }
     const newRecord = await this.sleepRecordsService.create(sleepRecord);
     return {
       message: 'New Record Saved',
@@ -233,16 +249,34 @@ export class SleepRecordsController {
     @Body(new JoiValidationPipe(update)) sleepRecord: UpdateSleepRecordDto,
   ) {
     const existingAccount = await this.sleepRecordsService.findOne(+id);
+
     if (existingAccount === null) {
       throw new BadRequestException(`Record not found for id ${id}`);
     }
     if (existingAccount !== null) {
       Object.assign(existingAccount, sleepRecord);
-      const affectedRows =
+
+      const savedData = await this.sleepRecordsService.findByAccountIdAndDate(
+        existingAccount.accountId,
+        existingAccount.date,
+      );
+
+      const totalSavedHours = savedData.reduce((total, item) => {
+        total += item.sleepHours;
+        return total;
+      }, 0);
+      const availableHours = 24 - totalSavedHours;
+      if (existingAccount.sleepHours > availableHours) {
+        throw new BadRequestException(
+          `Total Available Hours left for date ${existingAccount.date} are ${availableHours}`,
+        );
+      }
+
+      const updatedRows =
         await this.sleepRecordsService.update(existingAccount);
       return {
         message: `Sleep Record for ${id} updated successfully`,
-        affectedRows,
+        updatedRows,
       };
     }
   }

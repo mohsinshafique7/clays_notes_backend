@@ -33,6 +33,7 @@ describe('SleepRecordsController', () => {
             create: jest.fn(),
             update: jest.fn(),
             getByDate: jest.fn(),
+            findByAccountIdAndDate: jest.fn(),
           },
         },
       ],
@@ -43,7 +44,7 @@ describe('SleepRecordsController', () => {
   });
 
   describe('delete', () => {
-    it('should delete a sleep record by ID', async () => {
+    it('Should delete a sleep record by ID', async () => {
       const mockSleep = new SleepRecord();
       mockSleep.id = 1;
       const mockedDeleteResult = { affected: 1 };
@@ -71,7 +72,7 @@ describe('SleepRecordsController', () => {
     });
   });
   describe('findOne', () => {
-    it('should return a single sleep record by ID', async () => {
+    it('Should return a single sleep record by ID', async () => {
       const mockSleep = new SleepRecord();
       mockSleep.id = 1;
       jest.spyOn(service, 'findOne').mockResolvedValue(mockSleep);
@@ -81,7 +82,7 @@ describe('SleepRecordsController', () => {
     });
   });
   describe('getLastSevenDaysRecords', () => {
-    it('should return last seven days record', async () => {
+    it('Should return the sleep records for the last seven days', async () => {
       const mockSleep = [
         {
           id: 1,
@@ -136,7 +137,7 @@ describe('SleepRecordsController', () => {
       1,
     ];
 
-    it('should return all sleep records with pagination', async () => {
+    it('Should return all sleep records with pagination', async () => {
       jest
         .spyOn(service, 'findAll')
         .mockResolvedValue(mockRecords as [SleepRecord[], number]);
@@ -154,11 +155,8 @@ describe('SleepRecordsController', () => {
     });
   });
   describe('update', () => {
-    it('If record not found thorw error', async () => {
-      // { sleepHours: 5, date: "2024-05-02", accountId: 6 }
+    it('Should raise an error if the record is not found.', async () => {
       const mockSleep = new SleepRecord();
-      mockSleep.sleepHours = 5;
-      mockSleep.accountId = 6;
       jest.spyOn(service, 'findOne').mockResolvedValue(null);
       await expect(controller.update('1', mockSleep)).rejects.toThrow(
         new BadRequestException(`Record not found for id ${1}`),
@@ -166,31 +164,145 @@ describe('SleepRecordsController', () => {
       expect(service.findOne).toHaveBeenCalledTimes(1);
       expect(service.update).not.toHaveBeenCalled();
     });
-    it('Update record if found', async () => {
-      const mockedFoundData = new SleepRecord();
+    it('Should raise an error if sleep hours exceed the total hours saved in the database.', async () => {
       const mockedUpdateData = new SleepRecord();
+      mockedUpdateData.sleepHours = 20;
+      const mockedSavedData = [
+        {
+          id: 3,
+          sleepHours: 8,
+          date: new Date('2024-05-03'),
+          accountId: 1,
+        },
+        {
+          id: 4,
+          sleepHours: 6,
+          date: new Date('2024-05-06'),
+          accountId: 1,
+        },
+      ] as unknown as SleepRecord[];
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockedFoundData);
-      jest.spyOn(service, 'update').mockResolvedValue(1);
-      const res = await controller.update('1', mockedUpdateData);
-      expect(res).toEqual({
-        message: 'Sleep Record for 1 updated successfully',
-        affectedRows: 1,
+      jest.spyOn(service, 'findOne').mockResolvedValue(new SleepRecord());
+      jest
+        .spyOn(service, 'findByAccountIdAndDate')
+        .mockResolvedValue(mockedSavedData);
+      try {
+        await controller.update('1', mockedUpdateData);
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+      }
+    });
+    it('Should update the sleep record if found.', async () => {
+      const mockedUpdateData = {
+        id: 3,
+        sleepHours: 8,
+        date: '2024-05-03',
+        accountId: 1,
+      };
+      const mockedSavedData = [
+        {
+          id: 3,
+          sleepHours: 1,
+          date: '2024-05-03',
+          accountId: 1,
+        },
+        {
+          id: 4,
+          sleepHours: 1,
+          date: '2024-05-06',
+          accountId: 1,
+        },
+      ] as unknown as SleepRecord[];
+      jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(mockedUpdateData as unknown as SleepRecord);
+      jest
+        .spyOn(service, 'findByAccountIdAndDate')
+        .mockResolvedValue(mockedSavedData);
+      jest
+        .spyOn(service, 'update')
+        .mockResolvedValue(mockedUpdateData as unknown as SleepRecord);
+      const result = await controller.update(
+        '1',
+        mockedUpdateData as unknown as SleepRecord,
+      );
+      expect(result.message).toEqual(`Sleep Record for 1 updated successfully`);
+      expect(result.updatedRows).toEqual({
+        id: 3,
+        sleepHours: 8,
+        date: '2024-05-03',
+        accountId: 1,
       });
-      expect(service.update).toHaveBeenCalledTimes(1);
     });
   });
   describe('create', () => {
-    it('should create a new sleep record', async () => {
-      const returnValue = new SleepRecord();
-      jest.spyOn(service, 'create').mockResolvedValue(returnValue);
-      const res = await controller.create(returnValue);
+    it('Should raise an error if sleep hours exceed the total hours saved in the database.', async () => {
+      const mockedCreateData = new SleepRecord();
+      mockedCreateData.sleepHours = 20;
+      const mockedSavedData = [
+        {
+          id: 3,
+          sleepHours: 8,
+          date: '2024-05-03',
+          accountId: 1,
+        },
+        {
+          id: 4,
+          sleepHours: 6,
+          date: '2024-05-06',
+          accountId: 1,
+        },
+      ] as unknown as SleepRecord[];
 
-      expect(service.create).toHaveBeenCalledWith(returnValue);
-      // const formattedData = moment(newData.date).format('YYYY-MM-DD');
-      expect(res).toEqual({
-        message: 'New Record Saved',
-        new_record: returnValue,
+      jest.spyOn(service, 'findOne').mockResolvedValue(new SleepRecord());
+      jest
+        .spyOn(service, 'findByAccountIdAndDate')
+        .mockResolvedValue(mockedSavedData);
+      try {
+        await controller.create(mockedCreateData);
+      } catch (err) {
+        expect(err).toBeInstanceOf(BadRequestException);
+      }
+    });
+    it('Should create a new sleep record if it does not exist.', async () => {
+      const mockedUpdateData = {
+        id: 3,
+        sleepHours: 8,
+        date: '2024-05-03',
+        accountId: 1,
+      };
+      const mockedSavedData = [
+        {
+          id: 3,
+          sleepHours: 1,
+          date: '2024-05-03',
+          accountId: 1,
+        },
+        {
+          id: 4,
+          sleepHours: 1,
+          date: '2024-05-06',
+          accountId: 1,
+        },
+      ] as unknown as SleepRecord[];
+      jest
+        .spyOn(service, 'findOne')
+        .mockResolvedValue(mockedUpdateData as unknown as SleepRecord);
+      jest
+        .spyOn(service, 'findByAccountIdAndDate')
+        .mockResolvedValue(mockedSavedData);
+      jest
+        .spyOn(service, 'create')
+        .mockResolvedValue(mockedUpdateData as unknown as SleepRecord);
+      const result = await controller.create(
+        mockedUpdateData as unknown as SleepRecord,
+      );
+      expect(result.message).toEqual(`New Record Saved`);
+      expect(result.new_record).toEqual({
+        id: 3,
+        sleepHours: 8,
+        date: '2024-05-03',
+        accountId: 1,
       });
     });
   });

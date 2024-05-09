@@ -17,7 +17,13 @@ describe('AccountsService', () => {
         AccountsService,
         {
           provide: getRepositoryToken(Account),
-          useClass: Repository,
+          useValue: {
+            save: jest.fn(),
+            findAndCount: jest.fn(),
+            findOne: jest.fn(),
+            exists: jest.fn(),
+            delete: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -32,15 +38,27 @@ describe('AccountsService', () => {
     expect(service).toBeDefined();
   });
   describe('create', () => {
-    it('should create a new account', async () => {
+    it('Should create a new account.', async () => {
       const mockAccount: Account = new Account();
       jest.spyOn(accountRepository, 'save').mockResolvedValue(mockAccount);
       const result = await service.create(mockAccount);
       expect(result).toEqual(mockAccount);
     });
+    it('Should raise an error if database operation fails.', async () => {
+      const mockValue = new Account();
+      jest
+        .spyOn(accountRepository, 'save')
+        .mockRejectedValue(new Error('Database Error'));
+      try {
+        await service.create(mockValue);
+      } catch (err) {
+        expect(err).toBeInstanceOf(InternalServerErrorException);
+        expect(err.message).toBe('Cannot create account');
+      }
+    });
   });
   describe('Find All', () => {
-    it('should return all Accounts', async () => {
+    it('Should return all accounts with pagination.', async () => {
       const mockValue: [Account[], number] = [
         [{ id: 1, name: 'joe', gender: 'male' } as Account],
         1,
@@ -55,7 +73,7 @@ describe('AccountsService', () => {
         totalCount: 1,
       });
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       jest.spyOn(accountRepository, 'findAndCount').mockImplementation(() => {
         throw new Error('Database Error');
       });
@@ -67,14 +85,14 @@ describe('AccountsService', () => {
       }
     });
   });
-  describe('Find One', () => {
-    it('should return One Account', async () => {
+  describe('FindOne', () => {
+    it('Should return a single account by ID.', async () => {
       const mockValue = new Account();
       jest.spyOn(accountRepository, 'findOne').mockResolvedValue(mockValue);
       const result = await service.findOne(1);
       expect(result).toEqual(mockValue);
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       jest.spyOn(accountRepository, 'findOne').mockImplementation(() => {
         throw new Error('Database Error');
       });
@@ -87,12 +105,12 @@ describe('AccountsService', () => {
     });
   });
   describe('Exists', () => {
-    it('should return Boolean', async () => {
+    it('Should return true if the account exists.', async () => {
       jest.spyOn(accountRepository, 'exists').mockResolvedValue(true);
       const result = await service.exists(1);
       expect(result).toEqual(true);
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       jest.spyOn(accountRepository, 'exists').mockImplementation(() => {
         throw new Error('Database Error');
       });
@@ -104,13 +122,13 @@ describe('AccountsService', () => {
       }
     });
   });
-  describe('Exists', () => {
-    it('Find By name', async () => {
+  describe('Find By Name', () => {
+    it('Should return an account by name.', async () => {
       jest.spyOn(accountRepository, 'findOne').mockResolvedValue(new Account());
       const result = await service.findByName('joe');
       expect(result).toEqual(new Account());
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       jest.spyOn(accountRepository, 'findOne').mockImplementation(() => {
         throw new Error('Database Error');
       });
@@ -123,13 +141,13 @@ describe('AccountsService', () => {
     });
   });
   describe('update', () => {
-    it('should update account', async () => {
+    it('Should update an account.', async () => {
       const mockAccount: Account = new Account();
       jest.spyOn(accountRepository, 'save').mockResolvedValue(mockAccount);
       const result = await service.update(mockAccount);
       expect(result).toEqual(mockAccount);
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       const mockAccount = new Account(); // Define your mock account data
 
       jest.spyOn(accountRepository, 'save').mockImplementation(() => {
@@ -144,14 +162,14 @@ describe('AccountsService', () => {
     });
   });
   describe('Delete', () => {
-    it('should delete account', async () => {
+    it('Should delete account', async () => {
       jest
         .spyOn(accountRepository, 'delete')
         .mockResolvedValue({ raw: null, affected: 1 });
       const result = await service.remove(1);
       expect(result).toEqual({ raw: null, affected: 1 });
     });
-    it('should raise error', async () => {
+    it('Should raise an error if database operation fails.', async () => {
       accountRepository.delete = jest
         .fn()
         .mockRejectedValue(new Error('Database Error'));

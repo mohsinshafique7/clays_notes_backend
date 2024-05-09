@@ -7,7 +7,7 @@ async function bootstrap() {
     .setTitle('Sleep Tracking API')
     .setDescription('Backend Fo Cynomi Full Stack developer Assignment')
     .setVersion('1.0')
-    .addServer('http://localhost:5000/api', 'Local environment')
+    .addServer('http://localhost:5000/api', 'Local ')
     // .addServer('https://staging.yourapi.com/', 'Staging')
     // .addServer('https://production.yourapi.com/', 'Production')
     // .addTag('Your API Tag')
