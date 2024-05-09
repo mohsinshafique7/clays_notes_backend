@@ -8,15 +8,12 @@ async function bootstrap() {
     .setDescription('Backend Fo Cynomi Full Stack developer Assignment')
     .setVersion('1.0')
     .addServer('http://localhost:5000/api', 'Local ')
-    // .addServer('https://staging.yourapi.com/', 'Staging')
-    // .addServer('https://production.yourapi.com/', 'Production')
-    // .addTag('Your API Tag')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
   app.setGlobalPrefix('api');
   app.enableCors();
-  await app.listen(5000);
+  await app.listen(Number(process.env.PORT));
 }
 bootstrap();
