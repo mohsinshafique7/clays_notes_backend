@@ -1,310 +1,108 @@
-# Cynomi Interview Assignment - Backend
+# Note Taking App
 
-This repository contains a NestJS backend solution for the Cynomi assignment.
+Welcome to the Note Taking App README! This application allows you to manage your notes with CRUD operations using a RESTful API built with NestJS, PostgreSQL for the database, and Docker Compose for easy setup. Swagger documentation is also provided for easy API exploration.
 
-## Dependencies
+## Features
 
-- **joi**: "^17.13.1"
-- **moment**: "^2.30.1"
-- **pg**: "^8.11.5"
-- **reflect-metadata**: "^0.1.13"
-- **swagger-ui-express**: "^5.0.0"
-- **typeorm**: "^0.3.20"
+- **CRUD Operations**: Create, Read, Update, and Delete notes.
+- **Validation**: Input validation using Joi to ensure data integrity.
+- **Database**: PostgreSQL database to persist notes data.
+- **Dockerization**: Use Docker Compose to orchestrate and run the app with all dependencies.
+- **Swagger Documentation**: API documentation available via Swagger UI at `http://localhost:5000/api-docs`.
 
-## Documentation
+## Technologies Used
 
-API documentation is available at [http://localhost:5000/api-docs/](http://localhost:5000/api-docs/).
+- **NestJS**: A progressive Node.js framework for building efficient, reliable, and scalable server-side applications.
+- **Joi**: Schema validation for JavaScript objects.
+- **PostgreSQL**: A powerful, open-source object-relational database system.
+- **Docker Compose**: Tool for defining and running multi-container Docker applications.
+- **Swagger**: API documentation tool for OpenAPI specifications.
 
-## Testing
+## Prerequisites
 
-Unit tests are implemented using Jest, and end-to-end tests are completed using Supertest.
+Make sure you have the following installed on your machine:
 
-## Running the Application
+- Docker
+- Docker Compose
 
-To run the application, use the following command:
+## Getting Started
 
-```bash
-docker-compose up
-```
+To get the Note Taking App up and running locally, follow these steps:
 
-## Environment Variables
+1. **Clone the repository**:
 
-The application utilizes environment variables for configuration, including `PORT` and `NODE_ENV` (test|production). Depending on the `NODE_ENV`, databases are connected accordingly.
+   ```bash
+   https://github.com/mohsinshafique7/clays_notes_backend.git
+   cd clays_notes_backend
+   ```
 
-## Data Model
+2. **Set Environment Variables**:
 
-- **Account**: Includes fields `id`, `name`, and `gender`.
-- **Sleep Record**: Includes fields `accountId`, `date`, and `sleepHours`. Both have a one-to-many relationship, and cascade delete is enabled.
+      .env file already in repo for your convenience.
+       Adjust the values as per your setup if necessary.
 
-## CRUD Operations
+3. **Start the Application**:
+a. Create network(if not exists before):
+   ```bash
+    docker create network app-network
+   ```
+b. Run docker container:
 
-CRUD operations for `Account` and `Sleep Record` are implemented and accessible via [http://localhost:5000/api-docs/](http://localhost:5000/api-docs/).
+   ```bash
+    docker-compose up
+   ```
 
-## Validations
+   The app will be available at [http://localhost:3000](http://localhost:3000).
 
-Validations are implemented using JOI:
+   This command will build and start the NestJS server and PostgreSQL database containers.
 
-- `name`: Alphabet and space characters only, should not be empty.
-- `date`: Format 'YYYY-MM-DD', future dates not allowed.
-- `gender`: Must be 'male', 'female', or 'other'.
-- `sleepHours`: Cannot exceed 24 hours in a day, minimum value is 1.
+4. **Access the Application**:
 
-## Pagination
+   Once Docker Compose has successfully started the containers, you can access the Note Taking App:
 
-GET requests are paginated for improved performance.
+   - API Endpoint: `http://localhost:5000`
+   - Swagger Documentation: `http://localhost:5000/api-docs`
 
-## Test Coverage
+## API Documentation (Swagger)
 
-Test coverage report can be found in `coverage/icov-report/index.html`.
+### Available Endpoints
 
-## Test Files
+- **Create Note**:
+  - Endpoint: `POST /api/notes`
+  - Request Body: `{ "title": "Note Title", "description": "Note Description" }`
+  - Response: `201 Created`
 
-- **E2E Tests**: Located in the `test` folder.
-- **Unit Tests**: Located in the same directory as the file being tested.
+- **Get All Notes**:
+  - Endpoint: `GET /api/notes`
+  - Response: `200 OK`
 
-Sure, here's a formatted version for the README.md file, grouped by controllers and service:
+- **Get Note by ID**:
+  - Endpoint: `GET /api/notes/:id`
+  - Response: `200 OK` or `404 Not Found`
 
-### Accounts Controller:
+- **Update Note**:
+  - Endpoint: `PUT /api/notes/:id`
+  - Request Body: `{ "title": "Updated Title", "description": "Updated Description" }`
+  - Response: `200 OK` or `404 Not Found`
 
-#### Delete:
+- **Delete Note**:
+  - Endpoint: `DELETE /api/notes/:id`
+  - Response: `204 No Content` or `404 Not Found`
 
-- Should delete a sleep record by ID.
-- Should raise an error if the record is not found.
+## Development
 
-#### findOne:
+To run the app in development mode without Docker, follow these steps:
 
-- Should return a single account record by ID.
+1. Install dependencies:
 
-#### findAll:
+   ```bash
+   npm install
+   ```
 
-- Should return all sleep records with pagination.
+2. Start the server:
 
-#### update:
+   ```bash
+   npm run start:dev
+   ```
 
-- Should raise an error if the record is not found.
-- Should update the record if found.
-
-#### create:
-
-- Should create a new record.
-- Should raise an error if the record already exists and sleep hours exceed 24.
-- Should update the record if it already exists.
-
-### AccountsService Test Cases:
-
-#### Create:
-
-- Should create a new account.
-- Should raise an error if database operation fails.
-
-#### Find All:
-
-- Should return all accounts with pagination.
-- Should raise an error if database operation fails.
-
-#### FindOne:
-
-- Should return a single account by ID.
-- Should raise an error if database operation fails.
-
-#### Exists:
-
-- Should return true if the account exists.
-- Should raise an error if database operation fails.
-
-#### Find By Name:
-
-- Should return an account by name.
-- Should raise an error if database operation fails.
-
-#### Update:
-
-- Should update an account.
-- Should raise an error if database operation fails.
-
-#### Delete:
-
-- Should delete an account.
-- Should raise an error if database operation fails.
-
-### SleepRecordsService Test Cases:
-
-#### Update:
-
-- Should update a sleep record.
-- Should raise an error if the database operation fails.
-
-#### Create:
-
-- Should create a new sleep record.
-- Should raise an error if the database operation fails.
-
-#### Get By Date:
-
-- Should return a sleep record for a specific date and account ID.
-- Should raise an error if the database operation fails.
-- Should return an empty array if no records are found for the specified date and account ID.
-
-#### Find All:
-
-- Should return sleep records with pagination.
-- Should return empty data if no records are found.
-- Should raise an error if the database operation fails.
-
-#### FindOne:
-
-- Should return a single sleep record by ID.
-- Should return an empty object if no record is found.
-- Should raise an error if the database operation fails.
-
-#### Find By Account ID And Date:
-
-- Should return sleep records for a specific account ID and date.
-- Should return empty data if no records are found.
-- Should raise an error if the database operation fails.
-
-#### Remove:
-
-- Should remove a sleep record.
-- Should raise an error if the database operation fails.
-
-### Sleep Records Controller:
-
-#### delete:
-
-- Should delete a sleep record by ID.
-- Should raise a 404 error if the record is not found.
-
-#### findOne:
-
-- Should return a single sleep record by ID.
-
-#### getLastSevenDaysRecords:
-
-- Should return the sleep records for the last seven days.
-
-#### findAll:
-
-- Should return all sleep records with pagination.
-
-#### update:
-
-- Should raise an error if the record is not found.
-- Should raise an error if sleep hours exceed the total hours saved in the database.
-- Should update the sleep record if found.
-
-#### create:
-
-- Should raise an error if sleep hours exceed the total hours saved in the database.
-- Should create a new sleep record if it does not exist.
-
-### Sleep Records Service:
-
-#### Update:
-
-- Should update a sleep record.
-- Should raise an error if the database operation fails.
-
-#### Create:
-
-- Should create a new sleep record.
-- Should raise an error if the database operation fails.
-
-#### getByDate:
-
-- Should return a sleep record for a specific date and account ID.
-- Should raise an error if the database operation fails.
-- Should return an empty array if no records are found for the specified date and account ID.
-
-#### findAll:
-
-- Should return sleep records with pagination.
-- Should return empty data if no records are found.
-- Should raise an error if the database operation fails.
-
-#### findOne:
-
-- Should return a single sleep record by ID.
-- Should return an empty object if no record is found.
-- Should raise an error if the database operation fails.
-
-#### findByAccountIdAndDate:
-
-- Should return sleep records for a specific account ID and date.
-- Should return empty data if no records are found.
-- Should raise an error if the database operation fails.
-
-#### Remove:
-
-- Should remove a sleep record.
-- Should raise an error if the database operation fails.
-
-### AppController End-to-End (E2E) Test Cases:
-
-#### GET /
-
-- Should return "Hello World!" with status code 200.
-
-#### Save:
-
-- Should return status code 400 with error message if request body is empty.
-- Should return status code 400 with error messages if required keys are missing in the request body.
-- Wrong formatting test and date test:
-- Should return status code 400 with error messages for invalid data formats.
-- Should return status code 400 with error message if the date is in the future.
-- Should save a new record and return status code 200 with the saved record data.
-- Should update the record if the same name is entered and return status code 200 with the updated record message.
-- Should return status code 400 with error message if sleep hours exceed 24 hours.
-
-#### Get All:
-
-- Should return status code 200 with all records.
-
-#### Get Single:
-
-- Should return status code 200 with a single record.
-
-#### Update:
-
-- Return Error if record not found:
-- Should return status code 400 with error message if the record is not found.
-- Success Update:
-- Should update the record and return status code 200 with success message and updated record data.
-
-#### Delete:
-
-- Return Error if record not found:
-- Should return status code 404 with error message if the record is not found.
-
-### Sleep Controller End-to-End (E2E) Test Cases:
-
-#### Sleep Record:
-
-#### Create ERROR TESTING:
-
-- Should return status code 400 with error messages if required keys are missing in the request body.
-- Wrong formatting and date test:
-- Should return status code 400 with error messages for invalid data formats.
-- Should return status code 400 with error message if the date is in the future or sleep hours exceed 24 hours.
-- Success Save Record:
-- Should save a new sleep record and return status code 200 with success message.
-
-#### Last Seven:
-
-- Should return status code 200 with sleep records for the last seven days.
-
-#### Get Single:
-
-- Should return status code 200 with a single sleep record.
-
-#### Update:
-
-- Return Error if record not found:
-- Should return status code 400 with error message if the record is not found.
-- Success Update:
-- Should update the sleep record and return status code 200 with success message and updated rows count.
-
-#### Delete:
-
-- Return Error if record not found:
-- Should return status code 404 with error message if the sleep record is not found.
+3. Access the app at `http://localhost:5000`.
