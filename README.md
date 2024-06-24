@@ -42,11 +42,11 @@ To get the Note Taking App up and running locally, follow these steps:
        Adjust the values as per your setup if necessary.
 
 3. **Start the Application**:
-a. Create network(if not exists before):
+4. Create network(if not exists before):
    ```bash
     docker create network app-network
    ```
-b. Run docker container:
+5. Run docker container:
 
    ```bash
     docker-compose up
@@ -56,7 +56,7 @@ b. Run docker container:
 
    This command will build and start the NestJS server and PostgreSQL database containers.
 
-4. **Access the Application**:
+6. **Access the Application**:
 
    Once Docker Compose has successfully started the containers, you can access the Note Taking App:
 
