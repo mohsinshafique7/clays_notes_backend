@@ -1,5 +1,5 @@
 # Use Node.js LTS version as base image
-FROM node:18
+FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5000
 
 # Command to run the application in development mode with hot-reloading
-CMD ["npm", "run", "start:dev"]
+CMD ["yarn", "start:dev"]
