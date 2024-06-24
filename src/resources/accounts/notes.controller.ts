@@ -55,8 +55,6 @@ export class NotesController {
   @UsePipes(new JoiValidationPipe(createNoteSchema))
   async create(@Body() createNoteDto: CreateNoteDto) {
     const { title, description } = createNoteDto;
-    // export from Dto file
-    // const note = plainToInstance(Note, createNoteDto);
     const note = new Note();
     note.title = title;
     note.description = description;
