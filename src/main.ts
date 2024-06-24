@@ -4,8 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const options = new DocumentBuilder()
-    .setTitle('Sleep Tracking API')
-    .setDescription('Backend Fo Cynomi Full Stack developer Assignment')
+    .setTitle('Note Taking App API')
+    .setDescription('Backend For Clays Full Stack developer Assignment')
     .setVersion('1.0')
     .addServer('http://localhost:5000/api', 'Local ')
     .build();
