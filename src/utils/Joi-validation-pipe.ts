@@ -11,7 +11,7 @@ export class JoiValidationPipe implements PipeTransform {
       stripUnknown: true,
     });
     if (error) {
-      const errorMessage = error.details.map((err) => err.message).join(',');
+      const errorMessage = error.details.map((err) => err.message);
       throw new BadRequestException(errorMessage);
     }
     return validatedValue;

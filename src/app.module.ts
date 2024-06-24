@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AccountsModule } from './resources/accounts/accounts.module';
-import { SleepRecordsModule } from './resources/sleep-records/sleep-records.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { NotesModule } from './resources/accounts/notes.module';
 const dev: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'db',
@@ -27,11 +26,7 @@ const test: TypeOrmModuleOptions = {
 const selectedDatabase: TypeOrmModuleOptions =
   process.env.NODE_ENV === 'test' ? test : dev;
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(selectedDatabase),
-    AccountsModule,
-    SleepRecordsModule,
-  ],
+  imports: [TypeOrmModule.forRoot(selectedDatabase), NotesModule],
   controllers: [AppController],
   providers: [AppService],
 })
