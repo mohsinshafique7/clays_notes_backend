@@ -96,13 +96,13 @@ To run the app in development mode without Docker, follow these steps:
 1. Install dependencies:
 
    ```bash
-   npm install
+   yarn
    ```
 
 2. Start the server:
 
    ```bash
-   npm run start:dev
+   yarn start:dev
    ```
 
 3. Access the app at `http://localhost:5000`.
