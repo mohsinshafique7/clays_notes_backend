@@ -6,9 +6,7 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   BadRequestException,
-  NotFoundException,
   UsePipes,
 } from '@nestjs/common';
 import {
@@ -16,7 +14,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
