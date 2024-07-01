@@ -38,13 +38,12 @@ To get the Note Taking App up and running locally, follow these steps:
 
 2. **Set Environment Variables**:
 
-      .env file already in repo for your convenience.
-       Adjust the values as per your setup if necessary.
+      create .env as example.env
 
 3. **Start the Application**:
 4. Create network(if not exists before):
    ```bash
-    docker create network app-network
+    docker network create app-network
    ```
 5. Run docker container:
 

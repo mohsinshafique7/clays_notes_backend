@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install both dependencies and devDependencies
-RUN yarn
+RUN npm install
 # Copy application source code
 COPY . .
 
@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5000
 
 # Command to run the application in development mode with hot-reloading
-CMD ["yarn", "start:dev"]
+CMD ["npm","run", "start:dev"]

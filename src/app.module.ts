@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { NotesModule } from './resources/accounts/notes.module';
+import { NotesModule } from './resources/notes/notes.module';
 const dev: TypeOrmModuleOptions = {
   type: 'postgres',
   host: 'db',
